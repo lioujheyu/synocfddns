@@ -9,7 +9,7 @@ import re
 import json
 import requests
 
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('/volume1/@appstore/py3k/usr/local/lib'))
 import CloudFlare
 
 def my_ip_address():
@@ -97,9 +97,16 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
 
 def main():
     """Cloudflare API code - example"""
-
+    """
+    Synology give the parameters in the following order
+    $1=username, $2=password, $3=hostname, $4=ip
+    """
     try:
-        dns_name = sys.argv[1]
+        email = sys.argv[1]
+        api_key = sys.argv[2]
+        dns_name = sys.argv[3]
+        # ip = sys.argv[4]
+
     except IndexError:
         exit('usage: example-update-dynamic-dns.py fqdn-hostname')
 
@@ -109,7 +116,7 @@ def main():
 
     print('MY IP: %s %s' % (dns_name, ip_address))
 
-    cf = CloudFlare.CloudFlare()
+    cf = CloudFlare.CloudFlare(email=email, token=api_key)
 
     # grab the zone identifier
     try:
