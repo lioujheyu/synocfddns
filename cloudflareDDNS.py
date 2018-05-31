@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Cloudflare API code - example"""
+"""
+This code is largely from
+https://raw.githubusercontent.com/cloudflare/python-cloudflare/master/examples/example_update_dynamic_dns.py
+"""
 
 from __future__ import print_function
 
@@ -12,31 +15,7 @@ import requests
 sys.path.insert(0, os.path.abspath('/volume1/@appstore/py3k/usr/local/lib'))
 import CloudFlare
 
-# def my_ip_address():
-#     """Cloudflare API code - example"""
-
-#     # This list is adjustable - plus some v6 enabled services are needed
-#     # url = 'http://myip.dnsomatic.com'
-#     # url = 'http://www.trackip.net/ip'
-#     # url = 'http://myexternalip.com/raw'
-#     url = 'https://api.ipify.org'
-#     try:
-#         ip_address = requests.get(url).text
-#     except:
-#         exit('%s: failed' % (url))
-#     if ip_address == '':
-#         exit('%s: failed' % (url))
-
-#     if ':' in ip_address:
-#         ip_address_type = 'AAAA'
-#     else:
-#         ip_address_type = 'A'
-
-#     return ip_address, ip_address_type
-
 def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type):
-    """Cloudflare API code - example"""
-
     try:
         params = {'name':dns_name, 'match':'all', 'type':ip_address_type}
         dns_records = cf.zones.dns_records.get(zone_id, params=params)
@@ -50,13 +29,9 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
         old_ip_address = dns_record['content']
         old_ip_address_type = dns_record['type']
 
-        if ip_address_type not in ['A', 'AAAA']:
-            # we only deal with A / AAAA records
-            continue
-
         if ip_address_type != old_ip_address_type:
             # only update the correct address type (A or AAAA)
-            # we don't see this becuase of the search params above
+            # we don't see this because of the search params above
             print('IGNORED: %s %s ; wrong address family' % (dns_name, old_ip_address))
             continue
 
@@ -95,12 +70,7 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
         exit('/zones.dns_records.post %s - %d %s - api call failed' % (dns_name, e, e))
     print('CREATED: %s %s' % (dns_name, ip_address))
 
-def main():
-    """Cloudflare API code - example"""
-    """
-    Synology give the parameters in the following order
-    $1=username, $2=password, $3=hostname, $4=ip
-    """
+if __name__ == '__main__':
     try:
         email = sys.argv[1]
         api_key = sys.argv[2]
@@ -108,16 +78,11 @@ def main():
         ip_address = sys.argv[4]
 
     except IndexError:
-        exit('usage: example-update-dynamic-dns.py fqdn-hostname')
+        # Synology gives the parameters in this particular order.
+        exit('usage: cloudflare.py <username> <api_key> <hostname> <ip_address>')
 
     host_name, zone_name = dns_name.split('.', 1)
-
-    if ':' in ip_address:
-        ip_address_type = 'AAAA'
-    else:
-        ip_address_type = 'A'
-
-    print('MY IP: %s %s' % (dns_name, ip_address))
+    ip_address_type = 'AAAA' if ':' in ip_address else 'A'
 
     cf = CloudFlare.CloudFlare(email=email, token=api_key)
 
@@ -137,13 +102,5 @@ def main():
         exit('/zones.get - %s - api call returned %d items' % (zone_name, len(zones)))
 
     zone = zones[0]
-
-    zone_name = zone['name']
-    zone_id = zone['id']
-
-    do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
+    do_dns_update(cf, zone['name'], zone['id'], dns_name, ip_address, ip_address_type)
     exit(0)
-
-if __name__ == '__main__':
-    main()
-
