@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Cloudflare API code - example"""
 
 from __future__ import print_function
@@ -12,27 +12,27 @@ import requests
 sys.path.insert(0, os.path.abspath('/volume1/@appstore/py3k/usr/local/lib'))
 import CloudFlare
 
-def my_ip_address():
-    """Cloudflare API code - example"""
+# def my_ip_address():
+#     """Cloudflare API code - example"""
 
-    # This list is adjustable - plus some v6 enabled services are needed
-    # url = 'http://myip.dnsomatic.com'
-    # url = 'http://www.trackip.net/ip'
-    # url = 'http://myexternalip.com/raw'
-    url = 'https://api.ipify.org'
-    try:
-        ip_address = requests.get(url).text
-    except:
-        exit('%s: failed' % (url))
-    if ip_address == '':
-        exit('%s: failed' % (url))
+#     # This list is adjustable - plus some v6 enabled services are needed
+#     # url = 'http://myip.dnsomatic.com'
+#     # url = 'http://www.trackip.net/ip'
+#     # url = 'http://myexternalip.com/raw'
+#     url = 'https://api.ipify.org'
+#     try:
+#         ip_address = requests.get(url).text
+#     except:
+#         exit('%s: failed' % (url))
+#     if ip_address == '':
+#         exit('%s: failed' % (url))
 
-    if ':' in ip_address:
-        ip_address_type = 'AAAA'
-    else:
-        ip_address_type = 'A'
+#     if ':' in ip_address:
+#         ip_address_type = 'AAAA'
+#     else:
+#         ip_address_type = 'A'
 
-    return ip_address, ip_address_type
+#     return ip_address, ip_address_type
 
 def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type):
     """Cloudflare API code - example"""
@@ -105,14 +105,17 @@ def main():
         email = sys.argv[1]
         api_key = sys.argv[2]
         dns_name = sys.argv[3]
-        # ip = sys.argv[4]
+        ip_address = sys.argv[4]
 
     except IndexError:
         exit('usage: example-update-dynamic-dns.py fqdn-hostname')
 
     host_name, zone_name = dns_name.split('.', 1)
 
-    ip_address, ip_address_type = my_ip_address()
+    if ':' in ip_address:
+        ip_address_type = 'AAAA'
+    else:
+        ip_address_type = 'A'
 
     print('MY IP: %s %s' % (dns_name, ip_address))
 
