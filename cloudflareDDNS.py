@@ -4,15 +4,12 @@ This code is largely from
 https://raw.githubusercontent.com/cloudflare/python-cloudflare/master/examples/example_update_dynamic_dns.py
 """
 
-from __future__ import print_function
-
 import os
 import sys
 import re
 import json
 import requests
 
-sys.path.insert(0, os.path.abspath('/volume1/@appstore/py3k/usr/local/lib'))
 import CloudFlare
 
 def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type):
@@ -23,6 +20,7 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
         exit('/zones/dns_records %s - %d %s - api call failed' % (dns_name, e, e))
 
     updated = False
+    unchanged = True
 
     # update the record - unless it's already correct
     for dns_record in dns_records:
@@ -30,13 +28,9 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
         old_ip_address_type = dns_record['type']
 
         if ip_address_type != old_ip_address_type:
-            # only update the correct address type (A or AAAA)
-            # we don't see this because of the search params above
-            print('IGNORED: %s %s ; wrong address family' % (dns_name, old_ip_address))
             continue
 
         if ip_address == old_ip_address:
-            print('UNCHANGED: %s %s' % (dns_name, ip_address))
             updated = True
             continue
 
@@ -52,10 +46,13 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
             dns_record = cf.zones.dns_records.put(zone_id, dns_record_id, data=dns_record)
         except CloudFlare.exceptions.CloudFlareAPIError as e:
             exit('/zones.dns_records.put %s - %d %s - api call failed' % (dns_name, e, e))
-        print('UPDATED: %s %s -> %s' % (dns_name, old_ip_address, ip_address))
+        print('UPDATED: %s %s -> %s (good)' % (dns_name, old_ip_address, ip_address))
+        unchanged = False
         updated = True
 
     if updated:
+        if unchanged:
+            print('Update successfully but the IP address have not changed (nochg)')
         return
 
     # no exsiting dns record to update - so create dns record
@@ -68,7 +65,7 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
         dns_record = cf.zones.dns_records.post(zone_id, data=dns_record)
     except CloudFlare.exceptions.CloudFlareAPIError as e:
         exit('/zones.dns_records.post %s - %d %s - api call failed' % (dns_name, e, e))
-    print('CREATED: %s %s' % (dns_name, ip_address))
+    print('CREATED: %s %s (good)' % (dns_name, ip_address))
 
 if __name__ == '__main__':
     try:
@@ -96,7 +93,7 @@ if __name__ == '__main__':
         exit('/zones.get - %s - api call failed' % (e))
 
     if len(zones) == 0:
-        exit('/zones.get - %s - zone not found' % (zone_name))
+        exit('/zones.get - %s - zone not found(nohost)' % (zone_name))
 
     if len(zones) != 1:
         exit('/zones.get - %s - api call returned %d items' % (zone_name, len(zones)))
