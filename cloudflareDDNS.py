@@ -46,13 +46,13 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
             dns_record = cf.zones.dns_records.put(zone_id, dns_record_id, data=dns_record)
         except CloudFlare.exceptions.CloudFlareAPIError as e:
             exit('/zones.dns_records.put %s - %d %s - api call failed' % (dns_name, e, e))
-        print('UPDATED: %s %s -> %s (good)' % (dns_name, old_ip_address, ip_address))
+        print('good - Update successfully.')
         unchanged = False
         updated = True
 
     if updated:
         if unchanged:
-            print('Update successfully but the IP address have not changed (nochg)')
+            print('nochg - Update successfully but the IP address have not changed.')
         return
 
     # no exsiting dns record to update - so create dns record
@@ -65,7 +65,7 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
         dns_record = cf.zones.dns_records.post(zone_id, data=dns_record)
     except CloudFlare.exceptions.CloudFlareAPIError as e:
         exit('/zones.dns_records.post %s - %d %s - api call failed' % (dns_name, e, e))
-    print('CREATED: %s %s (good)' % (dns_name, ip_address))
+    print('good - Update successfully.')
 
 if __name__ == '__main__':
     try:
@@ -88,12 +88,15 @@ if __name__ == '__main__':
         params = {'name':zone_name}
         zones = cf.zones.get(params=params)
     except CloudFlare.exceptions.CloudFlareAPIError as e:
-        exit('/zones %d %s - api call failed' % (e, e))
+        if 'X-Auth' in str(e):
+            exit('badauth - Authenticate failed.')
+        else:
+            exit('/zones %d %s - api call failed' % (e, e))
     except Exception as e:
         exit('/zones.get - %s - api call failed' % (e))
 
     if len(zones) == 0:
-        exit('/zones.get - %s - zone not found(nohost)' % (zone_name))
+        exit('nohost - The hostname specified does not exist in this user account.')
 
     if len(zones) != 1:
         exit('/zones.get - %s - api call returned %d items' % (zone_name, len(zones)))
