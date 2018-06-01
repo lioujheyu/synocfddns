@@ -46,13 +46,13 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
             dns_record = cf.zones.dns_records.put(zone_id, dns_record_id, data=dns_record)
         except CloudFlare.exceptions.CloudFlareAPIError as e:
             exit('/zones.dns_records.put %s - %d %s - api call failed' % (dns_name, e, e))
-        print('good - Update successfully.')
+        print('good')
         unchanged = False
         updated = True
 
     if updated:
         if unchanged:
-            print('nochg - Update successfully but the IP address have not changed.')
+            print('nochg')
         return
 
     # no exsiting dns record to update - so create dns record
@@ -65,7 +65,7 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
         dns_record = cf.zones.dns_records.post(zone_id, data=dns_record)
     except CloudFlare.exceptions.CloudFlareAPIError as e:
         exit('/zones.dns_records.post %s - %d %s - api call failed' % (dns_name, e, e))
-    print('good - Update successfully.')
+    print('good')
 
 if __name__ == '__main__':
     try:
@@ -73,7 +73,6 @@ if __name__ == '__main__':
         api_key = sys.argv[2]
         dns_name = sys.argv[3]
         ip_address = sys.argv[4]
-
     except IndexError:
         # Synology gives the parameters in this particular order.
         exit('usage: cloudflare.py <username> <api_key> <hostname> <ip_address>')
@@ -88,15 +87,14 @@ if __name__ == '__main__':
         params = {'name':zone_name}
         zones = cf.zones.get(params=params)
     except CloudFlare.exceptions.CloudFlareAPIError as e:
-        if 'X-Auth' in str(e):
-            exit('badauth - Authenticate failed.')
-        else:
-            exit('/zones %d %s - api call failed' % (e, e))
+        print('badauth')
+        exit()
     except Exception as e:
         exit('/zones.get - %s - api call failed' % (e))
 
     if len(zones) == 0:
-        exit('nohost - The hostname specified does not exist in this user account.')
+        print('nohost')
+        exit()
 
     if len(zones) != 1:
         exit('/zones.get - %s - api call returned %d items' % (zone_name, len(zones)))
