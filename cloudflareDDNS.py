@@ -40,7 +40,8 @@ def do_dns_update(cf, zone_name, zone_id, dns_name, ip_address, ip_address_type)
         dns_record = {
             'name':dns_name,
             'type':ip_address_type,
-            'content':ip_address
+            'content':ip_address,
+            'proxied':True
         }
         try:
             dns_record = cf.zones.dns_records.put(zone_id, dns_record_id, data=dns_record)
