@@ -21,7 +21,7 @@ sudo chmod +x /usr/local/bin/cloudflareDDNS.py
    You can firstly test the script's functionality. Running this script without any arguments gives the usage, like
  `cloudflareDDNS.py <username> <api_key> <hostname> <ip_address>`    
  `username` is your CloudFlare username, usually the email address you registered in CloudFlare. `api_key` is your personal CloudFlare API key. See [here](https://support.cloudflare.com/hc/en-us/articles/200167836-Where-do-I-find-my-Cloudflare-API-key-) in how to retrive the key.
-6. Integrate the script into Synology DDNS management interface by adding the following text into /etc.defaults/ddns_provider.conf`
+6. Integrate the script into Synology DDNS management interface by adding the following text into `/etc.defaults/ddns_provider.conf`
 ```
 [Cloudflare]
         modulepath=/usr/local/bin/cloudflareDDNS.py
