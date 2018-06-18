@@ -76,7 +76,7 @@ if __name__ == '__main__':
         ip_address = sys.argv[4]
     except IndexError:
         # Synology gives the parameters in this particular order.
-        exit('usage: cloudflare.py <username> <api_key> <hostname> <ip_address>')
+        exit('usage: cloudflareDDNS.py <username> <api_key> <hostname> <ip_address>')
 
     host_name, zone_name = dns_name.split('.', 1)
     ip_address_type = 'AAAA' if ':' in ip_address else 'A'
