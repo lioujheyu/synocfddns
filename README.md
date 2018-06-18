@@ -1,5 +1,5 @@
 A simple script update CloudFlare DDNS for Synology NAS. This script can be integrated into Synology NAS UI.
-It refers to [official CloudFlare's API example for Python](https://raw.githubusercontent.com/cloudflare/python-cloudflare/master/examples/example_update_dynamic_dns.py)
+It largely refers to [official CloudFlare's API example for Python](https://raw.githubusercontent.com/cloudflare/python-cloudflare/master/examples/example_update_dynamic_dns.py)
 
 # Installation
 1. Install python3 from synology package using the NAS web interface.
