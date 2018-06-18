@@ -15,7 +15,7 @@ You can put whereever you want. Just remember the path.
   ```
     wget https://raw.githubusercontent.com/lioujheyu/synocfddns/master/cloudflareDDNS.py
     sudo mv cloudflareDDNS.py /usr/local/bin
-    sudo chmod +x /usr/local/bin
+    sudo chmod +x /usr/local/bin/cloudflareDDNS.py
   ```
 5. (optional)
    You can firstly test the script's functionality. Running this script without any arguments gives the usage, like
